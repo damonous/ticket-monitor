@@ -9,7 +9,8 @@ const sourceName = cfg.mock ? 'mock' : cfg.source;
 
 console.log(`starting ticket-monitor (source=${sourceName}, interval=${cfg.intervalSeconds}s, port=${cfg.httpPort || 'off'})`);
 
-startServer({ port: cfg.httpPort, basePath: cfg.publicBasePath, sourceName });
+const discordConfigured = !!cfg.webhookUrl && !cfg.webhookUrl.includes('placeholder');
+startServer({ port: cfg.httpPort, basePath: cfg.publicBasePath, sourceName, discordConfigured });
 
 run({
   fetchSnapshot,

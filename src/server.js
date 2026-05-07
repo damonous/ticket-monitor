@@ -12,7 +12,7 @@ function escape(s) {
   }[c]));
 }
 
-function renderPage({ basePath, state, alerts, sourceName }) {
+function renderPage({ basePath, state, alerts, sourceName, discordConfigured }) {
   const prefix = basePath.endsWith('/') ? basePath.slice(0, -1) : basePath;
 
   const eventBlock = state ? `
@@ -76,14 +76,14 @@ function renderPage({ basePath, state, alerts, sourceName }) {
   <h2>Recent alerts</h2>
   ${alertsBlock}
 
-  <p class="meta">Source: <code>${escape(sourceName)}</code> · Auto-refreshes every 30s.</p>
+  <p class="meta">Source: <code>${escape(sourceName)}</code> · ${discordConfigured ? 'Discord webhook active' : 'Discord webhook unconfigured (alerts visible above; set <code>DISCORD_WEBHOOK_URL</code> to forward to a channel)'} · Auto-refreshes every 30s.</p>
 </div>
 <script>setTimeout(() => location.reload(), 30000);</script>
 </body>
 </html>`;
 }
 
-export function startServer({ port, basePath, sourceName }) {
+export function startServer({ port, basePath, sourceName, discordConfigured }) {
   if (!port) return null;
 
   const server = http.createServer(async (req, res) => {
@@ -112,7 +112,7 @@ export function startServer({ port, basePath, sourceName }) {
       }
 
       const [state, alerts] = await Promise.all([readState(), readAlerts()]);
-      const html = renderPage({ basePath, state, alerts, sourceName });
+      const html = renderPage({ basePath, state, alerts, sourceName, discordConfigured });
       res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
       res.end(html);
     } catch (err) {
