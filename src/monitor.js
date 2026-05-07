@@ -31,15 +31,20 @@ export async function tick({ fetchSnapshot, webhookUrl }) {
   const prev = await readState();
   const reasons = diff(prev, snapshot);
 
-  if (reasons.length) {
-    await postAlert({ webhookUrl, snapshot, prev, reasons });
-    await pushAlert({ at: snapshot.fetched_at, snapshot, prev, reasons });
-    console.log(`[${snapshot.fetched_at}] alerted: ${reasons.join('; ')}`);
-  } else {
+  await writeState(snapshot);
+
+  if (!reasons.length) {
     console.log(`[${snapshot.fetched_at}] no change (listings=${snapshot.listing_count}, low=$${snapshot.price_lowest})`);
+    return;
   }
 
-  await writeState(snapshot);
+  await pushAlert({ at: snapshot.fetched_at, snapshot, prev, reasons });
+  try {
+    await postAlert({ webhookUrl, snapshot, prev, reasons });
+    console.log(`[${snapshot.fetched_at}] alerted: ${reasons.join('; ')}`);
+  } catch (err) {
+    console.error(`[${snapshot.fetched_at}] discord post failed (alert still recorded): ${err.message}`);
+  }
 }
 
 export async function run({ fetchSnapshot, webhookUrl, intervalSeconds }) {
