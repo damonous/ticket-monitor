@@ -1,0 +1,19 @@
+Hey Charles, Robert here. Quick walkthrough of the demo I built for the ticket-alert project.
+
+This is a live status page running on my server. The monitor is up and polling a real Ticketmaster event right now.
+
+What you're looking at: the bot pulls the event snapshot from Ticketmaster every five minutes. It diffs against the last snapshot. If the lowest price moves more than five percent, or the listing count moves by five or more, it fires an alert.
+
+The event I picked for the demo is Aries Spears at Addison Improv, June 14th. Lowest price right now is thirty-eight dollars, top end is three thirty-four. The bot logs every poll and every alert it triggers.
+
+The Recent Alerts panel below shows what alerts have actually fired. You're seeing the initial snapshot capture. As prices move over the coming hours, more alerts will appear here.
+
+A note on Discord. The footer says the webhook is unconfigured. That's deliberate. The Discord integration is in the code, ready to fire. For your real rollout, you want the webhook pointing at your server, your channels, your roles. So I'm not going to spin up a Discord I control just to make the demo louder. The on-page log shows you the same alerts the webhook would post. Setting one env var, DISCORD_WEBHOOK_URL, and the alerts forward on the next tick.
+
+Full source is on GitHub at github dot com slash damonous slash ticket-monitor. README has the env vars, the file layout, and deploy notes.
+
+Two things to flag for our next conversation. First, SeatGeek. I registered for their developer API but they manually approve new accounts on a weekly cycle. Once that comes through I can build a SeatGeek-specific demo. The pattern you're seeing today maps cleanly over.
+
+Second, the DICE proof of concept. As I said in my reply, that one I want to bill for. The recon work is the real cost there, not the alerting code. The alerting code, you've already seen it work end to end.
+
+Once you've had a look, let's book that forty-five minute architecture call. I'll walk you through how the pieces fit and what the v1 scope looks like with DICE, Tao Rewards, and AXS in the picture. Talk soon.

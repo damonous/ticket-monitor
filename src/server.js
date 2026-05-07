@@ -1,5 +1,9 @@
 import http from 'node:http';
+import { promises as fs, createReadStream } from 'node:fs';
+import path from 'node:path';
 import { readState, readAlerts } from './store.js';
+
+const EXPLAINER_PATH = path.resolve('data', 'explainer.mp4');
 
 function fmtUSD(n) {
   if (n === null || n === undefined) return '—';
@@ -69,6 +73,7 @@ function renderPage({ basePath, state, alerts, sourceName, discordConfigured }) 
 <div class="wrap">
   <h1>Ticket Monitor</h1>
   <p class="lede">Polls a single live event for inventory and price movements, posts alerts to a Discord channel. Built as a working demo of the alerting pattern: pull, diff, alert, persist, repeat.</p>
+  <p class="lede"><a href="${prefix}/explainer.mp4">Watch the 2-minute walkthrough</a> or <a href="https://github.com/damonous/ticket-monitor">read the source on GitHub</a>.</p>
 
   <h2>Now monitoring</h2>
   ${eventBlock}
@@ -94,6 +99,38 @@ export function startServer({ port, basePath, sourceName, discordConfigured }) {
       if (path === '/healthz') {
         res.writeHead(200, { 'Content-Type': 'text/plain' });
         res.end('ok');
+        return;
+      }
+
+      if (path === '/explainer.mp4') {
+        try {
+          const stat = await fs.stat(EXPLAINER_PATH);
+          const range = req.headers.range;
+          if (range) {
+            const m = /bytes=(\d+)-(\d*)/.exec(range);
+            if (m) {
+              const start = parseInt(m[1], 10);
+              const end = m[2] ? parseInt(m[2], 10) : stat.size - 1;
+              res.writeHead(206, {
+                'Content-Type': 'video/mp4',
+                'Content-Length': end - start + 1,
+                'Content-Range': `bytes ${start}-${end}/${stat.size}`,
+                'Accept-Ranges': 'bytes',
+              });
+              createReadStream(EXPLAINER_PATH, { start, end }).pipe(res);
+              return;
+            }
+          }
+          res.writeHead(200, {
+            'Content-Type': 'video/mp4',
+            'Content-Length': stat.size,
+            'Accept-Ranges': 'bytes',
+          });
+          createReadStream(EXPLAINER_PATH).pipe(res);
+        } catch (err) {
+          res.writeHead(404, { 'Content-Type': 'text/plain' });
+          res.end('explainer.mp4 not found');
+        }
         return;
       }
 

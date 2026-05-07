@@ -5,3 +5,7 @@ data/alerts.json
 *.log
 .DS_Store
 .playwright-mcp/
+data/explainer.mp4
+video_assets/*.mp4
+video_assets/*.webm
+video_assets/*.png
