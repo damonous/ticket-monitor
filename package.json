@@ -1,0 +1,17 @@
+{
+  "name": "seatgeek-discord-monitor",
+  "version": "0.1.0",
+  "description": "Polls a SeatGeek event for inventory and price changes, posts alerts to a Discord channel.",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "start:mock": "MOCK=1 node src/index.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5"
+  }
+}

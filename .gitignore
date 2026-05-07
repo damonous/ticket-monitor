@@ -1,0 +1,7 @@
+node_modules/
+.env
+data/state.json
+data/alerts.json
+*.log
+.DS_Store
+.playwright-mcp/

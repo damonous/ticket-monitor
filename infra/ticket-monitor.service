@@ -1,0 +1,19 @@
+[Unit]
+Description=Ticket Monitor (SeatGeek/Ticketmaster -> Discord alerts)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/ticket-monitor
+EnvironmentFile=/opt/ticket-monitor/.env
+ExecStart=/usr/bin/node /opt/ticket-monitor/src/index.js
+Restart=on-failure
+RestartSec=5
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=ticket-monitor
+User=root
+
+[Install]
+WantedBy=multi-user.target
